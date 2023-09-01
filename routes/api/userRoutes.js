@@ -32,6 +32,6 @@ router.delete('/search-history/:searchId', requireAuth, userController.deleteUse
 
 
 // Chat
-router.post('/chat', userController.chat); // Testing removing the auth
+router.post('/chat', requireAuth, userController.chat);
 
 module.exports = router;
