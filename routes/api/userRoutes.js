@@ -1,3 +1,4 @@
+// routes/api/userRoutes.js
 const express = require('express');
 const router = express.Router();
 const userController = require('../../controllers/userController');
@@ -20,6 +21,9 @@ router.get('/search-history', requireAuth, userController.getSearchHistory);
 
 // Update search history
 router.post('/search-history', requireAuth, userController.updateUserSearchHistory);
+
+// Update repetition interval by search Id
+router.put('/search-history/:searchId/repetition-interval', requireAuth, userController.updateRepetitionIntervalBySearchId);
 
 // Update search history title by search Id
 router.put('/search-history/:searchId', requireAuth, userController.updateUserSearchHistoryTitleBySearchId);
