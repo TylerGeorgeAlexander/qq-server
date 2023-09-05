@@ -1,4 +1,17 @@
+// models/User.js
 const mongoose = require('mongoose');
+
+// Define the repetition interval schema
+const repetitionIntervalSchema = new mongoose.Schema({
+  interval: {
+    type: String,
+    required: true,
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+});
 
 // Define the user schema
 const userSchema = new mongoose.Schema({
@@ -27,6 +40,7 @@ const userSchema = new mongoose.Schema({
     title: {
       type: String,
     },
+    repetitionIntervals: [repetitionIntervalSchema],  // Array of repetition intervals
     timestamp: {
       type: Date,
       default: Date.now,
