@@ -3,6 +3,9 @@ const router = express.Router();
 const requireAuth = require("../middleware/requireAuth");
 const deckController = require("../controllers/deckController");
 
+// Route to fetch all decks
+router.get('/decks', deckController.getAllDecks);
+
 // Fetch search history entries for a specific deck
 router.get("/:deckId/search-history", requireAuth, deckController.fetchSearchHistoryForDeck);
 
