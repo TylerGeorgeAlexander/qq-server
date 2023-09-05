@@ -1,16 +1,15 @@
 const Deck = require("../models/Deck");
-const SearchHistory = require("../models/SearchHistory");
+const User = require("../models/User"); // Import the User model
 
 const getAllDecks = async (req, res) => {
     try {
-        const decks = await Deck.find(); // Assuming you're using a MongoDB model
+        const decks = await Deck.find();
         res.status(200).json(decks);
     } catch (error) {
         console.error("Error fetching decks:", error);
         res.status(500).json({ error: 'Failed to fetch decks' });
     }
 }
-
 
 const fetchSearchHistoryForDeck = async (req, res) => {
     try {
@@ -25,9 +24,15 @@ const fetchSearchHistoryForDeck = async (req, res) => {
 
         const searchHistoryIds = targetDeck.searchHistory;
 
-        const searchHistoryEntries = await SearchHistory.find({
-            _id: { $in: searchHistoryIds },
-        });
+        const user = await User.findById(userId); // Fetch the user
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const searchHistoryEntries = user.searchHistory.filter(entry =>
+            searchHistoryIds.includes(entry._id.toString())
+        );
 
         return res.status(200).json({ searchHistory: searchHistoryEntries });
     } catch (error) {
@@ -66,7 +71,7 @@ const addSearchHistoryToDeck = async (req, res) => {
             return res.status(404).json({ message: "Deck not found" });
         }
 
-        const searchHistory = await SearchHistory.findById(searchHistoryId);
+        const searchHistory = await User.findById(searchHistoryId); // Fetch the search history from User model
 
         if (!searchHistory) {
             return res.status(404).json({ message: "Search history not found" });
