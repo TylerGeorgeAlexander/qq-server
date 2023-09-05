@@ -170,72 +170,74 @@ const updateUserSearchHistory = async (req, res) => {
 // Controller function to update user search history's repetition interval
 const updateRepetitionIntervalBySearchId = async (req, res) => {
     try {
-      const { searchId } = req.params;
-      const userId = req.userId;
-      const { response } = req.body;
-  
-      const user = await User.findById(userId);
-  
-      const searchEntry = user.searchHistory.id(searchId);
-      if (!searchEntry) {
-        return res.status(404).json({ message: 'Search entry not found' });
-      }
-  
-      // Calculate repetition interval based on the selected response
-      let repetitionInterval = 0;
-      if (response === 'again') {
-        repetitionInterval = 1 * 60 * 1000; // 1 minute in milliseconds
-      } else if (response === 'hard') {
-        repetitionInterval = 6 * 60 * 1000; // 6 minutes in milliseconds
-      } else if (response === 'good') {
-        repetitionInterval = 10 * 60 * 1000; // 10 minutes in milliseconds
-      } else if (response === 'easy') {
-        const currentIntervalIndex = searchEntry.repetitionIntervals.length;
-        repetitionInterval = calculateEasyInterval(currentIntervalIndex);
-      }
-  
-      // Update repetition interval in the search entry
-      searchEntry.repetitionInterval = repetitionInterval;
-  
-      await user.save();
-  
-      res.status(200).json({ message: 'Repetition interval updated' });
+        const { searchId } = req.params;
+        const userId = req.userId;
+        const { response } = req.body;
+
+        const user = await User.findById(userId);
+
+        const searchEntry = user.searchHistory.id(searchId);
+        if (!searchEntry) {
+            return res.status(404).json({ message: 'Search entry not found' });
+        }
+
+        // Helper function to calculate the easy interval
+        const calculateEasyInterval = (currentIntervalIndex) => {
+            const intervalsInDays = [1, 3, 7, 21, 30, 45, 60]; // Your repetition intervals in days
+
+            if (currentIntervalIndex < intervalsInDays.length) {
+                return intervalsInDays[currentIntervalIndex] * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+            } else {
+                // If all intervals are used, return the last interval
+                return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
+            }
+        };
+        
+        // Calculate repetition interval based on the selected response
+        let repetitionInterval = 0;
+        if (response === 'again') {
+            repetitionInterval = 1 * 60 * 1000; // 1 minute in milliseconds
+        } else if (response === 'hard') {
+            repetitionInterval = 6 * 60 * 1000; // 6 minutes in milliseconds
+        } else if (response === 'good') {
+            repetitionInterval = 10 * 60 * 1000; // 10 minutes in milliseconds
+        } else if (response === 'easy') {
+            const currentIntervalIndex = searchEntry.repetitionIntervals.length;
+            repetitionInterval = calculateEasyInterval(currentIntervalIndex);
+        }
+
+        // Update repetition interval in the search entry
+        searchEntry.repetitionInterval = repetitionInterval;
+
+        await user.save();
+
+        res.status(200).json({ message: 'Repetition interval updated' });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-  };
-  
-  // Helper function to calculate the easy interval
-  const calculateEasyInterval = (currentIntervalIndex) => {
-    const intervalsInDays = [1, 3, 7, 21, 30, 45, 60]; // Your repetition intervals in days
-    
-    if (currentIntervalIndex < intervalsInDays.length) {
-      return intervalsInDays[currentIntervalIndex] * 24 * 60 * 60 * 1000; // Convert days to milliseconds
-    } else {
-      // If all intervals are used, return the last interval
-      return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
-    }
-  };
-  
-  module.exports = {
+};
+
+
+
+module.exports = {
     updateRepetitionIntervalBySearchId,
-  };
-  
-  
+};
+
+
 // Helper function for updateRepetitionIntervalBySearchId
 const calculateEasyInterval = (currentIntervalIndex) => {
     // Your repetition intervals in days
     const intervalsInDays = [1, 3, 7, 21, 30, 45, 60];
-    
+
     if (currentIntervalIndex < intervalsInDays.length) {
-      return intervalsInDays[currentIntervalIndex] * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+        return intervalsInDays[currentIntervalIndex] * 24 * 60 * 60 * 1000; // Convert days to milliseconds
     } else {
-      // If all intervals are used, return the last interval
-      return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
+        // If all intervals are used, return the last interval
+        return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
     }
-  };
-  
+};
+
 
 // Controller function to update user search history's title
 const updateUserSearchHistoryTitleBySearchId = async (req, res) => {
