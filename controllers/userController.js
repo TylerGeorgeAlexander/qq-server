@@ -192,7 +192,7 @@ const updateRepetitionIntervalBySearchId = async (req, res) => {
                 return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
             }
         };
-        
+
         // Calculate repetition interval based on the selected response
         let repetitionInterval = 0;
         if (response === 'again') {
@@ -217,27 +217,6 @@ const updateRepetitionIntervalBySearchId = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
-
-
-module.exports = {
-    updateRepetitionIntervalBySearchId,
-};
-
-
-// Helper function for updateRepetitionIntervalBySearchId
-const calculateEasyInterval = (currentIntervalIndex) => {
-    // Your repetition intervals in days
-    const intervalsInDays = [1, 3, 7, 21, 30, 45, 60];
-
-    if (currentIntervalIndex < intervalsInDays.length) {
-        return intervalsInDays[currentIntervalIndex] * 24 * 60 * 60 * 1000; // Convert days to milliseconds
-    } else {
-        // If all intervals are used, return the last interval
-        return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
-    }
-};
-
 
 // Controller function to update user search history's title
 const updateUserSearchHistoryTitleBySearchId = async (req, res) => {
