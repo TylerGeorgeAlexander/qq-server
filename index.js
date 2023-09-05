@@ -24,18 +24,7 @@ db.once('open', () => {
 const cors = require('cors');
 const app = express();
 
-const allowedOrigins = ['https://quickquestion-client-ab1c2fa4677d.herokuapp.com'];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
-}));
-
+app.use(cors()); // This allows all origins to access your server
 
 app.use(express.json());
 
