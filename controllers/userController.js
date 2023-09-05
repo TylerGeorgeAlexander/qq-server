@@ -170,40 +170,72 @@ const updateUserSearchHistory = async (req, res) => {
 // Controller function to update user search history's repetition interval
 const updateRepetitionIntervalBySearchId = async (req, res) => {
     try {
-        const { searchId } = req.params;
-        const userId = req.userId;
-
-        const user = await User.findById(userId);
-
-        const searchEntry = user.searchHistory.id(searchId);
-        if (!searchEntry) {
-            return res.status(404).json({ message: 'Search entry not found' });
-        }
-
-        // Calculate the next repetition interval based on the provided intervals
-        const intervalsInDays = [1, 3, 7, 21, 30, 45, 60]; // Your repetition intervals in days
+      const { searchId } = req.params;
+      const userId = req.userId;
+      const { response } = req.body;
+  
+      const user = await User.findById(userId);
+  
+      const searchEntry = user.searchHistory.id(searchId);
+      if (!searchEntry) {
+        return res.status(404).json({ message: 'Search entry not found' });
+      }
+  
+      // Calculate repetition interval based on the selected response
+      let repetitionInterval = 0;
+      if (response === 'again') {
+        repetitionInterval = 1 * 60 * 1000; // 1 minute in milliseconds
+      } else if (response === 'hard') {
+        repetitionInterval = 6 * 60 * 1000; // 6 minutes in milliseconds
+      } else if (response === 'good') {
+        repetitionInterval = 10 * 60 * 1000; // 10 minutes in milliseconds
+      } else if (response === 'easy') {
         const currentIntervalIndex = searchEntry.repetitionIntervals.length;
-        if (currentIntervalIndex < intervalsInDays.length) {
-            const nextInterval = intervalsInDays[currentIntervalIndex];
-            const nextRepetitionDate = new Date();
-            nextRepetitionDate.setDate(nextRepetitionDate.getDate() + nextInterval);
-            
-            // Add the new repetition interval to the search entry
-            searchEntry.repetitionIntervals.push({
-                interval: `${nextInterval} day(s)`,
-                date: nextRepetitionDate,
-            });
-        }
-
-        await user.save();
-
-        return res.status(200).json({ message: 'Repetition interval updated successfully' });
+        repetitionInterval = calculateEasyInterval(currentIntervalIndex);
+      }
+  
+      // Update repetition interval in the search entry
+      searchEntry.repetitionInterval = repetitionInterval;
+  
+      await user.save();
+  
+      res.status(200).json({ message: 'Repetition interval updated' });
     } catch (error) {
-        console.error('Error updating repetition interval:', error);
-        return res.status(500).json({ message: 'An error occurred' });
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-};
-
+  };
+  
+  // Helper function to calculate the easy interval
+  const calculateEasyInterval = (currentIntervalIndex) => {
+    const intervalsInDays = [1, 3, 7, 21, 30, 45, 60]; // Your repetition intervals in days
+    
+    if (currentIntervalIndex < intervalsInDays.length) {
+      return intervalsInDays[currentIntervalIndex] * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+    } else {
+      // If all intervals are used, return the last interval
+      return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
+    }
+  };
+  
+  module.exports = {
+    updateRepetitionIntervalBySearchId,
+  };
+  
+  
+// Helper function for updateRepetitionIntervalBySearchId
+const calculateEasyInterval = (currentIntervalIndex) => {
+    // Your repetition intervals in days
+    const intervalsInDays = [1, 3, 7, 21, 30, 45, 60];
+    
+    if (currentIntervalIndex < intervalsInDays.length) {
+      return intervalsInDays[currentIntervalIndex] * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+    } else {
+      // If all intervals are used, return the last interval
+      return intervalsInDays[intervalsInDays.length - 1] * 24 * 60 * 60 * 1000;
+    }
+  };
+  
 
 // Controller function to update user search history's title
 const updateUserSearchHistoryTitleBySearchId = async (req, res) => {
