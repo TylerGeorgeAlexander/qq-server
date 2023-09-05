@@ -180,7 +180,20 @@ const updateRepetitionIntervalBySearchId = async (req, res) => {
             return res.status(404).json({ message: 'Search entry not found' });
         }
 
-        // Update repetition interval logic here
+        // Calculate the next repetition interval based on the provided intervals
+        const intervalsInDays = [1, 3, 7, 21, 30, 45, 60]; // Your repetition intervals in days
+        const currentIntervalIndex = searchEntry.repetitionIntervals.length;
+        if (currentIntervalIndex < intervalsInDays.length) {
+            const nextInterval = intervalsInDays[currentIntervalIndex];
+            const nextRepetitionDate = new Date();
+            nextRepetitionDate.setDate(nextRepetitionDate.getDate() + nextInterval);
+            
+            // Add the new repetition interval to the search entry
+            searchEntry.repetitionIntervals.push({
+                interval: `${nextInterval} day(s)`,
+                date: nextRepetitionDate,
+            });
+        }
 
         await user.save();
 
@@ -190,6 +203,7 @@ const updateRepetitionIntervalBySearchId = async (req, res) => {
         return res.status(500).json({ message: 'An error occurred' });
     }
 };
+
 
 // Controller function to update user search history's title
 const updateUserSearchHistoryTitleBySearchId = async (req, res) => {
