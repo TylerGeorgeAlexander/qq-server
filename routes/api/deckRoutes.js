@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const deckController = require("../controllers/deckController");
+const deckController = require("../../controllers/deckController");
 const { extractUserId, requireAuth } = require('../../middleware/authMiddleware');
 
 // Route to fetch all decks
