@@ -1,6 +1,17 @@
 const Deck = require("../models/Deck");
 const SearchHistory = require("../models/SearchHistory");
 
+const getAllDecks = async (req, res) => {
+    try {
+        const decks = await Deck.find(); // Assuming you're using a MongoDB model
+        res.status(200).json(decks);
+    } catch (error) {
+        console.error("Error fetching decks:", error);
+        res.status(500).json({ error: 'Failed to fetch decks' });
+    }
+}
+
+
 const fetchSearchHistoryForDeck = async (req, res) => {
     try {
         const { deckId } = req.params;
@@ -73,6 +84,7 @@ const addSearchHistoryToDeck = async (req, res) => {
 };
 
 module.exports = {
+    getAllDecks,
     fetchSearchHistoryForDeck,
     createDeck,
     addSearchHistoryToDeck,
