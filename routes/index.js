@@ -7,6 +7,6 @@ const deckRoutes = require('./api/deckRoutes');
 
 // Mount API routes
 router.use('/users', userRoutes);
-// router.use('/decks', deckRoutes);
+router.use('/decks', deckRoutes);
 
 module.exports = router;
