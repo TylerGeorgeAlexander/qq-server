@@ -1,3 +1,4 @@
+// controllers/userController.js
 const { config } = require('dotenv');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
@@ -145,12 +146,47 @@ const updateUserSearchHistory = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        user.searchHistory.push({ query, assertion, title: title || query });
+        const newRepetitionInterval = {
+            interval: "1 day", // Set the interval as needed
+            date: new Date(), // Use the current date
+        };
+
+        user.searchHistory.push({
+            query,
+            assertion,
+            title: title || query,
+            repetitionIntervals: [newRepetitionInterval], // Add the repetition interval
+        });
+
         await user.save();
 
         return res.status(200).json({ message: 'Search history updated successfully' });
     } catch (error) {
         console.error('Error updating search history:', error);
+        return res.status(500).json({ message: 'An error occurred' });
+    }
+};
+
+// Controller function to update user search history's repetition interval
+const updateRepetitionIntervalBySearchId = async (req, res) => {
+    try {
+        const { searchId } = req.params;
+        const userId = req.userId;
+
+        const user = await User.findById(userId);
+
+        const searchEntry = user.searchHistory.id(searchId);
+        if (!searchEntry) {
+            return res.status(404).json({ message: 'Search entry not found' });
+        }
+
+        // Update repetition interval logic here
+
+        await user.save();
+
+        return res.status(200).json({ message: 'Repetition interval updated successfully' });
+    } catch (error) {
+        console.error('Error updating repetition interval:', error);
         return res.status(500).json({ message: 'An error occurred' });
     }
 };
@@ -249,6 +285,7 @@ module.exports = {
     getUserProfile,
     getSearchHistory,
     updateUserSearchHistory,
+    updateRepetitionIntervalBySearchId,
     updateUserSearchHistoryTitleBySearchId,
     getUserSearchHistoryTitleBySearchId,
     deleteUserSearchHistoryBySearchId,
