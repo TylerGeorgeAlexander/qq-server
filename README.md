@@ -4,6 +4,8 @@
 
 Quick Question Server is a Node.js application that combines the power of the ChatGPT API with Spaced Interval Repetition, inspired by [Dr. Barbara Oakley's Learning How to Learn](https://barbaraoakley.com/books/learning-how-to-learn/) and [CzechUniversities](https://www.czechuniversities.com/article/study-skills-7-spaced-repetition#:~:text=Ideal%20intervals%20are%20as%20follows,into%20your%20long%2Dterm%20memory). You can also enhance your learning experience with [Coursera's Learning How to Learn](https://www.coursera.org/learn/learning-how-to-learn/).
 
+For the client-side counterpart, please visit [Quick Question Client](https://github.com/TylerGeorgeAlexander/qq-client).
+
 ### Installation
 
 1. Clone this repository to your local machine.
