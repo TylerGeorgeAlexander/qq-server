@@ -62,31 +62,44 @@ const createDeck = async (req, res) => {
 
 const addSearchHistoryToDeck = async (req, res) => {
     try {
-        const { deckId } = req.params;
-        const searchHistoryId = req.body.searchHistoryId;
-
-        const targetDeck = await Deck.findById(deckId);
-
-        if (!targetDeck) {
-            return res.status(404).json({ message: "Deck not found" });
-        }
-
-        const searchHistory = await User.findById(searchHistoryId); // Fetch the search history from User model
-
-        if (!searchHistory) {
-            return res.status(404).json({ message: "Search history not found" });
-        }
-
-        targetDeck.searchHistory.push(searchHistory);
-
-        await targetDeck.save();
-
-        return res.status(200).json({ message: "Search history added to deck" });
+      const { deckId } = req.params;
+      const { searchHistoryId } = req.body;
+  
+      const targetDeck = await Deck.findById(deckId);
+  
+      if (!targetDeck) {
+        return res.status(404).json({ message: "Deck not found" });
+      }
+  
+      const user = await User.findById(targetDeck.user);
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Find the search history entry in the user's searchHistory array
+      const searchHistoryEntry = user.searchHistory.find((entry) =>
+        entry._id.equals(searchHistoryId)
+      );
+  
+      if (!searchHistoryEntry) {
+        return res.status(404).json({ message: "Search history not found" });
+      }
+  
+      // Add a reference to the searchHistory entry in the targetDeck
+      targetDeck.searchHistory.push(searchHistoryEntry._id);
+  
+      await targetDeck.save();
+  
+      return res.status(200).json({ message: "Search history added to deck" });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-};
+  };
+  
+
+
 
 module.exports = {
     getAllDecks,
